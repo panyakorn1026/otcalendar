@@ -1,0 +1,682 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>บันทึกโอที</title>
+<script>
+  // ===== ตั้งค่า Supabase (ดูได้ที่ Supabase > Project Settings > API Keys) =====
+  window.OT_CONFIG = {
+  supabaseUrl: "https://lysaaxylkqyvnrewizoh.supabase.co",
+  supabaseKey: "sb_publishable_7upA4MpVMI4bjqhIUCksJw_xw9Fs1qr"
+  };
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+:root{
+  --bg:#F2F4F6; --surface:#FFFFFF; --surface-2:#E9EDF1; --line:#D5DCE3;
+  --ink:#15202B; --muted:#5B6875; --faint:#8A96A3;
+  --ot:#1C6E8C; --ot-soft:#DCEEF4; --ex:#C8661B; --ex-soft:#FBE8D8;
+  --danger:#B3261E; --focus:#1C6E8C; --hol:#A3212B; --hol-soft:#F7E3E4;
+  --sans:"IBM Plex Sans Thai",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#10161C; --surface:#18212A; --surface-2:#212C37; --line:#2E3B48;
+    --ink:#E6ECF1; --muted:#9AA7B4; --faint:#6E7B88;
+    --ot:#5DB3D2; --ot-soft:#16323E; --ex:#EE9A55; --ex-soft:#3A2616;
+    --danger:#F2847C; --focus:#5DB3D2; --hol:#F08A92; --hol-soft:#3A1C20;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#10161C; --surface:#18212A; --surface-2:#212C37; --line:#2E3B48;
+  --ink:#E6ECF1; --muted:#9AA7B4; --faint:#6E7B88;
+  --ot:#5DB3D2; --ot-soft:#16323E; --ex:#EE9A55; --ex-soft:#3A2616;
+  --danger:#F2847C; --focus:#5DB3D2; --hol:#F08A92; --hol-soft:#3A1C20;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;padding-inline:16px;padding-block:24px 48px}
+button,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.wrap{max-width:1040px;margin-inline:auto}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 14px;cursor:pointer;font-weight:500}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--ot);border-color:var(--ot);color:#fff}
+[data-theme="dark"] .btn.primary{color:#0B1A22}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.primary{color:#0B1A22}}
+.btn.primary:hover{filter:brightness(1.07)}
+.btn.ghost{border-color:transparent;background:transparent}
+.btn.danger{color:var(--danger)}
+label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px;font-weight:500}
+input[type=text],input[type=number],select,textarea{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:9px 12px}
+textarea{resize:vertical;min-height:64px}
+.t24{display:flex;align-items:center;gap:4px}
+.t24 select{font-family:var(--mono);font-variant-numeric:tabular-nums;padding:9px 6px;text-align:center;min-width:0;flex:1}
+.t24 span{font-family:var(--mono);font-weight:600;color:var(--muted)}
+input[readonly]{background:var(--surface-2);color:var(--muted)}
+.sun-note{font-size:13px;border-radius:8px;padding:8px 12px;background:var(--ex-soft);color:var(--ex)}
+
+/* ---- Login ---- */
+#login{min-height:calc(100vh - 80px);display:grid;place-items:center}
+.login-card{width:100%;max-width:380px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:28px 24px;display:grid;gap:18px}
+.stamp{display:flex;align-items:center;gap:10px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.stamp i{display:inline-block;width:26px;height:26px;border-radius:6px;background:var(--ot);position:relative}
+.stamp i::after{content:"";position:absolute;inset:7px 7px auto auto;width:8px;height:8px;border-radius:50%;background:var(--ex)}
+.login-card h1{margin:0;font-size:24px;line-height:1.25;text-wrap:balance}
+.login-card p{margin:0;color:var(--muted);font-size:14px}
+#empCode{font-family:var(--mono);font-size:22px;letter-spacing:.12em;text-align:center;padding:12px}
+.err{color:var(--danger);font-size:13px;min-height:1.2em;margin:0}
+.rule-note{font-size:13px;color:var(--muted);border-top:1px dashed var(--line);padding-top:14px}
+
+/* ---- App ---- */
+.export{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px;padding:12px 16px;margin-bottom:20px;border-style:dashed}
+.export .ex-title{font-weight:600}
+.export .ex-sub{font-size:13px;color:var(--muted)}
+.export .ex-btns{display:flex;flex-wrap:wrap;gap:8px}
+header.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px}
+.who{display:flex;align-items:center;gap:12px}
+.badge{font-family:var(--mono);background:var(--ink);color:var(--bg);border-radius:6px;padding:4px 10px;font-weight:600;letter-spacing:.06em}
+.who-name{font-weight:600}
+.who-sub{font-size:13px;color:var(--muted)}
+.grid-main{display:grid;gap:20px}
+.top-row{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:20px;align-items:start}
+@media (max-width:860px){.top-row{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.cal-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.cal-head h2{margin:0;font-size:18px}
+.cal-nav{display:flex;gap:4px}
+.dow,.days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+.dow div{font-size:12px;color:var(--faint);text-align:center;padding:8px 0;font-weight:600;letter-spacing:.04em}
+.dow div:first-child,.dow div:last-child{color:var(--ex)}
+.days{border-top:1px solid var(--line)}
+.day{min-height:88px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:6px;display:flex;flex-direction:column;gap:4px;text-align:left;background:none;border-top:0;border-left:0;cursor:pointer;border-radius:0}
+.day:nth-child(7n){border-right:0}
+.day:hover{background:var(--surface-2)}
+.day.out{background:var(--bg);cursor:default;color:var(--faint)}
+.day.out:hover{background:var(--bg)}
+.day .d{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--muted)}
+.day.today .d{background:var(--ink);color:var(--bg);border-radius:4px;padding:0 5px;align-self:flex-start}
+.day.sel{box-shadow:inset 0 0 0 2px var(--ot)}
+.chip{font-family:var(--mono);font-size:11.5px;font-weight:600;border-radius:4px;padding:1px 6px;align-self:flex-start;white-space:nowrap}
+.chip.ot{background:var(--ot-soft);color:var(--ot)}
+.chip.ex{background:var(--ex-soft);color:var(--ex)}
+.day .d-row{display:flex;align-items:center;gap:4px;min-width:0}
+.day.sun .d{color:var(--hol)}
+.day.holiday .d{align-self:flex-start;color:var(--hol);border:1.5px solid var(--hol);border-radius:50%;min-width:24px;height:24px;display:inline-grid;place-items:center;padding:0 2px}
+.day.holiday.today .d{background:var(--hol);color:#fff;border-radius:50%}
+.day .hol-name{font-size:10.5px;line-height:1.3;color:var(--hol);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.hol-tag{display:inline-block;font-size:13px;font-weight:600;color:var(--hol);background:var(--hol-soft);border-radius:6px;padding:2px 10px;margin-top:4px}
+.day .note-dot{font-size:11px;color:var(--faint);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+@media (max-width:560px){
+  .day{min-height:62px;padding:4px}
+  .chip{font-size:10px;padding:0 4px}
+  .day .note-dot,.day .hol-name{display:none}
+  .day.holiday .d{min-width:20px;height:20px}
+}
+.legend{display:flex;flex-wrap:wrap;gap:14px;padding:12px 16px;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:10px;height:10px;border-radius:2px;display:inline-block}
+
+.summary{padding:16px;display:grid;gap:14px}
+.summary h3,.editor h3{margin:0;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.stat{display:grid;gap:2px}
+.stat b{font-family:var(--mono);font-size:24px;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat small{font-size:12px;color:var(--muted)}
+.stat.ot b{color:var(--ot)} .stat.ex b{color:var(--ex)}
+.bar{height:8px;border-radius:4px;background:var(--surface-2);display:flex;overflow:hidden}
+.bar i{display:block;height:100%}
+
+.editor{padding:16px;display:grid;gap:14px}
+.editor .date-title{font-size:18px;font-weight:600;margin:0}
+.ed-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 12px}
+.ed-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) minmax(0,1.4fr);gap:12px;align-items:end}
+@media (max-width:640px){.ed-fields{grid-template-columns:1fr 1fr}.ed-fields .split{grid-column:1/-1}}
+.act-btns{display:flex;gap:8px;align-items:center}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.split div{border-radius:8px;padding:8px 10px}
+.split .s-ot{background:var(--ot-soft);color:var(--ot)}
+.split .s-ex{background:var(--ex-soft);color:var(--ex)}
+.split small{display:block;font-size:12px;opacity:.85}
+.split b{font-family:var(--mono);font-size:18px;line-height:1.2}
+.actions{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding-top:14px}
+.lang{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.lang button{border:0;background:transparent;padding:6px 10px;font-size:12.5px;font-weight:600;cursor:pointer;color:var(--muted);letter-spacing:.03em}
+.lang button+button{border-left:1px solid var(--line)}
+.lang button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.login-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.head-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.hint{font-size:12.5px;color:var(--muted);margin:0}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:8px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.show{opacity:1}
+.confirm{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--danger)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- ============ Phase 1: Login ============ -->
+<section id="login">
+  <form class="login-card" id="loginForm" autocomplete="off">
+    <div class="login-top"><div class="stamp"><i></i><span data-i18n="appName"></span></div><div class="lang" role="group" aria-label="Language"><button type="button" data-lang="th">ไทย</button><button type="button" data-lang="en">EN</button><button type="button" data-lang="fil">FIL</button></div></div>
+    <div>
+      <h1 data-i18n="loginTitle"></h1>
+      <p data-i18n="loginSub"></p>
+    </div>
+    <div>
+      <label for="empCode" data-i18n="empCode"></label>
+      <input type="text" id="empCode" maxlength="20" data-i18n-ph="empCodePh" inputmode="text" required>
+    </div>
+    <div id="nameWrap" hidden>
+      <label for="empName" data-i18n="empName"></label>
+      <input type="text" id="empName" maxlength="60" data-i18n-ph="empNamePh">
+    </div>
+    <p class="err" id="loginErr"></p>
+    <button class="btn primary" type="submit" id="loginBtn"></button>
+    <div class="rule-note" data-i18n-html="ruleNote"></div>
+  </form>
+</section>
+
+<!-- ============ Phase 2: OT calendar ============ -->
+<section id="app" hidden>
+  <div class="wrap">
+    <header class="top">
+      <div class="who">
+        <span class="badge" id="whoCode"></span>
+        <div>
+          <div class="who-name" id="whoName"></div>
+          <div class="who-sub" id="whoSub"></div>
+        </div>
+      </div>
+      <div class="head-right"><div class="lang" role="group" aria-label="Language"><button type="button" data-lang="th">ไทย</button><button type="button" data-lang="en">EN</button><button type="button" data-lang="fil">FIL</button></div><button class="btn" id="logoutBtn" data-i18n="logout"></button></div>
+    </header>
+
+    <div class="panel export" id="exportBox" hidden>
+      <div>
+        <div class="ex-title" data-i18n="exTitle"></div>
+        <div class="ex-sub" id="exStatus" data-i18n="exSub"></div>
+      </div>
+      <div class="ex-btns">
+        <button class="btn" id="exMonth" type="button">เดือนนี้</button>
+        <button class="btn" id="exYear" type="button">ทั้งปี</button>
+      </div>
+    </div>
+
+    <div class="grid-main">
+      <div class="top-row" id="topRow">
+        <form class="panel editor" id="editor">
+          <div class="ed-head">
+            <h3 data-i18n="recordOt"></h3>
+            <div><p class="date-title" id="edDate"></p><span class="hol-tag" id="edHol" hidden></span></div>
+          </div>
+          <div class="ed-fields">
+            <div><label for="edStart-h" data-i18n="start"></label><div class="t24" id="edStart"><select id="edStart-h" data-i18n-aria="startH"></select><span>:</span><select id="edStart-m" data-i18n-aria="startM"></select></div></div>
+            <div><label for="edEnd-h" data-i18n="end"></label><div class="t24" id="edEnd"><select id="edEnd-h" data-i18n-aria="endH"></select><span>:</span><select id="edEnd-m" data-i18n-aria="endM"></select></div></div>
+            <div><label for="edHours" id="edHoursLbl" data-i18n="hours"></label><input type="number" id="edHours" min="0" max="24" step="0.5" placeholder="0"></div>
+            <div class="split">
+              <div class="s-ot"><small>OT</small><b id="pvOt">0</b></div>
+              <div class="s-ex"><small>Extra OT</small><b id="pvEx">0</b></div>
+            </div>
+          </div>
+          <div>
+            <label for="edNote" data-i18n="note"></label>
+            <textarea id="edNote" maxlength="200" data-i18n-ph="notePh"></textarea>
+          </div>
+          <div class="actions">
+            <p class="hint" id="edHint" data-i18n="hint"></p>
+            <div class="act-btns">
+              <span id="delWrap"><button type="button" class="btn danger" id="delBtn" hidden data-i18n="del"></button></span>
+              <button type="submit" class="btn primary" id="saveBtn" data-i18n="save"></button>
+            </div>
+          </div>
+        </form>
+
+        <div class="panel summary">
+          <h3 id="sumTitle" data-i18n="sumTitle"></h3>
+          <div class="ex-sub num" id="sumRange" style="font-size:13px;color:var(--muted);margin-top:-8px"></div>
+          <div class="stats">
+            <div class="stat ot"><b id="sumOt">0</b><small data-i18n="otHrs"></small></div>
+            <div class="stat ex"><b id="sumEx">0</b><small data-i18n="exHrs"></small></div>
+            <div class="stat"><b id="sumDays">0</b><small data-i18n="otDays"></small></div>
+          </div>
+          <div class="bar" aria-hidden="true"><i id="barOt" style="background:var(--ot)"></i><i id="barEx" style="background:var(--ex)"></i></div>
+        </div>
+      </div>
+
+      <div class="panel" id="calendar">
+        <div class="cal-head">
+          <h2 id="monthTitle"></h2>
+          <div class="cal-nav">
+            <button class="btn ghost" id="prevM" data-i18n-aria="prev">‹</button>
+            <button class="btn" id="todayBtn" data-i18n="today"></button>
+            <button class="btn ghost" id="nextM" data-i18n-aria="next">›</button>
+          </div>
+        </div>
+        <div class="dow" id="dowRow"></div>
+        <div class="days" id="days"></div>
+        <div class="legend">
+          <span><i class="sw" style="background:var(--ot)"></i><span data-i18n="lgOt"></span></span>
+          <span><i class="sw" style="background:var(--ex)"></i><span data-i18n="lgEx"></span></span>
+          <span><i class="sw" style="background:transparent;border:1.5px solid var(--hol);border-radius:50%"></i><span data-i18n="lgHol"></span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  const OT_CAP = 3;
+  // ---------- Languages: ไทย / English / Filipino ----------
+  const I18N = {
+    th: {
+      appName:"ระบบบันทึกโอที", loginTitle:"เข้าสู่ระบบด้วยรหัสพนักงาน", loginSub:"ใส่รหัสพนักงานของคุณเพื่อดูและบันทึกโอทีของตัวเอง",
+      empCode:"รหัสพนักงาน", empCodePh:"เช่น 10245", empName:"ชื่อ-นามสกุล (ครั้งแรกเท่านั้น)", empNamePh:"ชื่อที่จะแสดงในระบบ",
+      login:"เข้าสู่ระบบ", register:"ลงทะเบียนและเข้าสู่ระบบ",
+      ruleNote:'เวลาทำงานปกติ <b class="num">08:30–17:30</b> นับโอทีเฉพาะเวลานอกช่วงเวลานี้<br>กติกา: โอทีปกติสูงสุด <b class="num">3</b> ชม./วัน ส่วนที่เกินจะนับเป็น <b style="color:var(--ex)">Extra OT</b>',
+      errShort:"รหัสพนักงานต้องมีอย่างน้อย 3 ตัว (ตัวอักษรอังกฤษหรือตัวเลข)", errNew:"ยังไม่พบรหัสนี้ในระบบ ใส่ชื่อเพื่อลงทะเบียนครั้งแรก",
+      errName:"กรุณาใส่ชื่อ-นามสกุล", errConn:"เชื่อมต่อระบบไม่สำเร็จ ลองใหม่อีกครั้ง",
+      subWork:"เวลาทำงานปกติ 08:30–17:30", subAdmin:"ผู้ดูแล · ดูปฏิทิน วันหยุด และดาวน์โหลดข้อมูล", employee:"พนักงาน", logout:"ออกจากระบบ",
+      exTitle:"ดาวน์โหลดโอทีของพนักงานทุกคน", exSub:"ไฟล์ .csv เปิดด้วย Excel ได้ · เฉพาะรหัสหัวหน้าเท่านั้น",
+      exPeriod:"ดาวน์โหลดรอบ {a} – {b}", exYear:"ดาวน์โหลดทั้งปี {y}", exLoading:"กำลังรวบรวมข้อมูล…", exEmpty:"ยังไม่มีข้อมูลโอทีในช่วงนี้",
+      exConfirm:"พบ {n} รายการจาก {p} คน · รอยืนยันการบันทึกไฟล์", exDone:"ดาวน์โหลดแล้ว: {n} รายการจาก {p} คน",
+      exDeclined:"ยกเลิกการดาวน์โหลดแล้ว", exBusy:"มีหน้าต่างยืนยันเปิดอยู่ ลองใหม่อีกครั้งในไม่กี่วินาที", exFail:"ดาวน์โหลดไม่สำเร็จ ลองใหม่อีกครั้ง",
+      csvId:"รหัสพนักงาน", csvName:"ชื่อ-นามสกุล", csvSummary:"สรุปรายคน", csvDays:"จำนวนวัน", csvHours:"ชั่วโมงรวม", fileAll:"OT_ทุกคน", fileTo:"ถึง",
+      recordOt:"บันทึกโอที", start:"เวลาเริ่ม (24 ชม.)", end:"เวลาเลิก (24 ชม.)", startH:"ชั่วโมงเริ่ม", startM:"นาทีเริ่ม", endH:"ชั่วโมงเลิก", endM:"นาทีเลิก",
+      hours:"ชั่วโมงรวม", note:"หมายเหตุ / งานที่ทำ", notePh:"เช่น เคลียร์ออเดอร์ไลน์ 2",
+      hint:"นับโอทีเฉพาะเวลานอก 08:30–17:30 · เลือกวันอื่นได้จากปฏิทินด้านล่าง",
+      del:"ลบรายการ", save:"บันทึก", sumTitle:"สรุปรอบโอที", otHrs:"OT (ชม.)", exHrs:"Extra (ชม.)", otDays:"วันที่มีโอที",
+      prev:"เดือนก่อนหน้า", next:"เดือนถัดไป", today:"วันนี้", lgOt:"OT (สูงสุด 3 ชม.)", lgEx:"Extra OT (ส่วนเกิน 3 ชม.)", lgHol:"วันหยุดบริษัท",
+      holTag:"วันหยุดบริษัท: {h}", edDate:"วัน{dow}ที่ {d} {m} {y}", ariaOt:"โอที {h} ชั่วโมง",
+      errHours:"ใส่จำนวนชั่วโมงระหว่าง 0.5 – 24", savedEx:"บันทึกแล้ว: OT {o} + Extra {e} ชม.", saved:"บันทึกแล้ว: OT {o} ชม.", saveFail:"บันทึกไม่สำเร็จ ลองใหม่อีกครั้ง",
+      delQ:"ลบจริงไหม?", delYes:"ลบ", cancel:"ยกเลิก", deleted:"ลบรายการแล้ว", delFail:"ลบไม่สำเร็จ",
+      months:["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"],
+      dow:["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัสบดี","ศุกร์","เสาร์"], dowShort:["อา","จ","อ","พ","พฤ","ศ","ส"], be:true
+    },
+    en: {
+      appName:"OT Recording", loginTitle:"Sign in with your employee ID", loginSub:"Enter your employee ID to view and record your own overtime.",
+      empCode:"Employee ID", empCodePh:"e.g. 10245", empName:"Full name (first time only)", empNamePh:"Name shown in the system",
+      login:"Sign in", register:"Register and sign in",
+      ruleNote:'Regular hours are <b class="num">08:30–17:30</b> every day (Sundays included); only time outside these hours counts as OT.<br>Rule: regular OT is capped at <b class="num">3</b> hrs/day; anything above counts as <b style="color:var(--ex)">Extra OT</b>.',
+      errShort:"Employee ID must be at least 3 characters (letters or numbers).", errNew:"This ID isn't registered yet. Enter your name to register.",
+      errName:"Please enter your full name.", errConn:"Couldn't connect. Please try again.",
+      subWork:"Regular hours 08:30–17:30", subAdmin:"Admin · view calendar, holidays and download data", employee:"Employee", logout:"Sign out",
+      exTitle:"Download OT for all employees", exSub:".csv file, opens in Excel · supervisor ID only",
+      exPeriod:"Download period {a} – {b}", exYear:"Download full year {y}", exLoading:"Collecting data…", exEmpty:"No OT records in this range yet.",
+      exConfirm:"Found {n} records from {p} people · confirm to save the file", exDone:"Downloaded: {n} records from {p} people",
+      exDeclined:"Download cancelled.", exBusy:"A confirmation is already open. Try again in a few seconds.", exFail:"Download failed. Please try again.",
+      csvId:"Employee ID", csvName:"Full name", csvSummary:"Summary per employee", csvDays:"Days", csvHours:"Total hours", fileAll:"OT_all", fileTo:"to",
+      recordOt:"Record OT", start:"Start (24h)", end:"End (24h)", startH:"Start hour", startM:"Start minute", endH:"End hour", endM:"End minute",
+      hours:"Total hours", note:"Note / work done", notePh:"e.g. clearing orders on line 2",
+      hint:"OT counts only time outside 08:30–17:30, every day including Sunday · pick another day from the calendar below",
+      del:"Delete entry", save:"Save", sumTitle:"OT period summary", otHrs:"OT (hrs)", exHrs:"Extra (hrs)", otDays:"Days with OT",
+      prev:"Previous month", next:"Next month", today:"Today", lgOt:"OT (up to 3 hrs)", lgEx:"Extra OT (over 3 hrs)", lgHol:"Company holiday",
+      holTag:"Company holiday: {h}", edDate:"{dow}, {d} {m} {y}", ariaOt:"OT {h} hours",
+      errHours:"Enter hours between 0.5 and 24", savedEx:"Saved: OT {o} + Extra {e} hrs", saved:"Saved: OT {o} hrs", saveFail:"Couldn't save. Please try again.",
+      delQ:"Delete this entry?", delYes:"Delete", cancel:"Cancel", deleted:"Entry deleted", delFail:"Couldn't delete",
+      months:["January","February","March","April","May","June","July","August","September","October","November","December"],
+      dow:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], dowShort:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"], be:false
+    },
+    fil: {
+      appName:"Pagtatala ng OT", loginTitle:"Mag-sign in gamit ang iyong employee ID", loginSub:"Ilagay ang iyong employee ID para makita at maitala ang sarili mong overtime.",
+      empCode:"Employee ID", empCodePh:"hal. 10245", empName:"Buong pangalan (unang beses lang)", empNamePh:"Pangalang ipapakita sa system",
+      login:"Mag-sign in", register:"Magparehistro at mag-sign in",
+      ruleNote:'Ang regular na oras ng trabaho ay <b class="num">08:30–17:30</b> araw-araw (kasama ang Linggo); ang oras lamang sa labas nito ang binibilang na OT.<br>Patakaran: hanggang <b class="num">3</b> oras/araw ang regular na OT; ang sobra rito ay <b style="color:var(--ex)">Extra OT</b>.',
+      errShort:"Dapat hindi bababa sa 3 character ang employee ID (letra o numero).", errNew:"Hindi pa rehistrado ang ID na ito. Ilagay ang iyong pangalan para magparehistro.",
+      errName:"Pakilagay ang iyong buong pangalan.", errConn:"Hindi makakonekta. Pakisubukang muli.",
+      subWork:"Regular na oras 08:30–17:30", subAdmin:"Admin · tingnan ang kalendaryo, holiday at i-download ang data", employee:"Empleyado", logout:"Mag-sign out",
+      exTitle:"I-download ang OT ng lahat ng empleyado", exSub:".csv file, nabubuksan sa Excel · para lang sa supervisor ID",
+      exPeriod:"I-download ang period {a} – {b}", exYear:"I-download ang buong taon {y}", exLoading:"Kinukuha ang data…", exEmpty:"Wala pang OT record sa saklaw na ito.",
+      exConfirm:"Nakita ang {n} record mula sa {p} tao · kumpirmahin para i-save ang file", exDone:"Na-download: {n} record mula sa {p} tao",
+      exDeclined:"Kinansela ang pag-download.", exBusy:"May bukas pang confirmation. Subukang muli pagkalipas ng ilang segundo.", exFail:"Hindi na-download. Pakisubukang muli.",
+      csvId:"Employee ID", csvName:"Buong pangalan", csvSummary:"Buod bawat empleyado", csvDays:"Bilang ng araw", csvHours:"Kabuuang oras", fileAll:"OT_lahat", fileTo:"hanggang",
+      recordOt:"Itala ang OT", start:"Simula (24h)", end:"Tapos (24h)", startH:"Oras ng simula", startM:"Minuto ng simula", endH:"Oras ng tapos", endM:"Minuto ng tapos",
+      hours:"Kabuuang oras", note:"Tala / ginawang trabaho", notePh:"hal. pag-clear ng order sa line 2",
+      hint:"Ang OT ay binibilang lang sa labas ng 08:30–17:30, araw-araw kasama ang Linggo · pumili ng ibang araw sa kalendaryo sa ibaba",
+      del:"Burahin", save:"I-save", sumTitle:"Buod ng OT period", otHrs:"OT (oras)", exHrs:"Extra (oras)", otDays:"Araw na may OT",
+      prev:"Nakaraang buwan", next:"Susunod na buwan", today:"Ngayon", lgOt:"OT (hanggang 3 oras)", lgEx:"Extra OT (lampas 3 oras)", lgHol:"Holiday ng kumpanya",
+      holTag:"Holiday ng kumpanya: {h}", edDate:"{dow}, {m} {d}, {y}", ariaOt:"OT {h} oras",
+      errHours:"Maglagay ng oras mula 0.5 hanggang 24", savedEx:"Na-save: OT {o} + Extra {e} oras", saved:"Na-save: OT {o} oras", saveFail:"Hindi na-save. Pakisubukang muli.",
+      delQ:"Burahin ito?", delYes:"Burahin", cancel:"Kanselahin", deleted:"Nabura na", delFail:"Hindi nabura",
+      months:["Enero","Pebrero","Marso","Abril","Mayo","Hunyo","Hulyo","Agosto","Setyembre","Oktubre","Nobyembre","Disyembre"],
+      dow:["Linggo","Lunes","Martes","Miyerkules","Huwebes","Biyernes","Sabado"], dowShort:["Lin","Lun","Mar","Miy","Huw","Biy","Sab"], be:false
+    }
+  };
+  const HOL_I18N = {
+    "2026-01-01":["วันขึ้นปีใหม่","New Year's Day","Bagong Taon"],
+    "2026-01-02":["แทนวันมาฆบูชา (อ. 3 มี.ค. 2569)","Substitute for Makha Bucha Day (3 Mar)","Kapalit ng Makha Bucha Day (Mar 3)"],
+    "2026-01-03":["แทนวันจักรี (จ. 6 เม.ย. 2569)","Substitute for Chakri Day (6 Apr)","Kapalit ng Chakri Day (Abr 6)"],
+    "2026-04-11":["แทนวันปิยมหาราช (ศ. 23 ต.ค. 2569)","Substitute for Chulalongkorn Day (23 Oct)","Kapalit ng Chulalongkorn Day (Okt 23)"],
+    "2026-04-13":["วันสงกรานต์","Songkran Festival","Songkran"],
+    "2026-04-14":["วันสงกรานต์","Songkran Festival","Songkran"],
+    "2026-04-15":["วันสงกรานต์","Songkran Festival","Songkran"],
+    "2026-05-01":["วันแรงงานแห่งชาติ","National Labour Day","Araw ng Paggawa"],
+    "2026-05-02":["แทนวันอาสาฬหบูชา (พ. 29 ก.ค. 2569)","Substitute for Asarnha Bucha Day (29 Jul)","Kapalit ng Asarnha Bucha Day (Hul 29)"],
+    "2026-05-04":["วันฉัตรมงคล","Coronation Day","Araw ng Koronasyon"],
+    "2026-06-03":["วันเฉลิมพระชนมพรรษา สมเด็จพระราชินี","H.M. Queen Suthida's Birthday","Kaarawan ni Reyna Suthida"],
+    "2026-07-28":["วันเฉลิมพระชนมพรรษา ร.10","H.M. King's Birthday (Rama X)","Kaarawan ng Hari (Rama X)"],
+    "2026-08-12":["วันแม่แห่งชาติ","H.M. Queen Mother's Birthday & Mother's Day","Kaarawan ng Inang Reyna at Araw ng mga Ina"],
+    "2026-10-13":["วันนวมินทรมหาราช","King Bhumibol Memorial Day","Araw ng Paggunita kay Haring Bhumibol"],
+    "2026-12-05":["วันพ่อแห่งชาติ","King Bhumibol's Birthday & Father's Day","Kaarawan ni Haring Bhumibol at Araw ng mga Ama"],
+    "2026-12-31":["วันสิ้นปี","New Year's Eve","Bisperas ng Bagong Taon"]
+  };
+  let LANG = (() => { try { const l = localStorage.getItem("ot:lang"); return I18N[l] ? l : "th"; } catch { return "th"; } })();
+  const t = (k, v) => { let x = (I18N[LANG][k] ?? I18N.th[k] ?? k); if (v) for (const [a,b] of Object.entries(v)) x = x.split("{"+a+"}").join(b); return x; };
+  const L = () => I18N[LANG];
+  const yr = y => L().be ? y + 543 : y;
+  const holName = k => { const h = HOL_I18N[k]; return h ? h[{th:0,en:1,fil:2}[LANG]] : null; };
+  function applyStatic(){
+    document.documentElement.lang = LANG === "fil" ? "fil" : LANG;
+    document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.dataset.i18n); });
+    document.querySelectorAll("[data-i18n-html]").forEach(el => { el.innerHTML = t(el.dataset.i18nHtml); });
+    document.querySelectorAll("[data-i18n-ph]").forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
+    document.querySelectorAll("[data-i18n-aria]").forEach(el => { el.setAttribute("aria-label", t(el.dataset.i18nAria)); });
+    document.querySelectorAll(".lang button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === LANG)));
+    const row = document.getElementById("dowRow"); if (row) row.innerHTML = L().dowShort.map(d => `<div>${d}</div>`).join("");
+  }
+  const $ = id => document.getElementById(id);
+
+  // ---------- Supabase ----------
+  const SB_URL = String(window.OT_CONFIG?.supabaseUrl || "").replace(/\/+$/, "");
+  const SB_KEY = String(window.OT_CONFIG?.supabaseKey || "");
+  const configured = /^https?:\/\//.test(SB_URL) && SB_KEY.length > 20 && !SB_KEY.includes("ใส่");
+  async function rpc(fn, args){
+    const headers = { "Content-Type": "application/json", apikey: SB_KEY };
+    if (SB_KEY.startsWith("eyJ")) headers.Authorization = "Bearer " + SB_KEY; // legacy anon key
+    const r = await fetch(`${SB_URL}/rest/v1/rpc/${fn}`, { method: "POST", headers, body: JSON.stringify(args) });
+    if (!r.ok) { const e = new Error(`${fn} ${r.status}`); e.status = r.status; throw e; }
+    const txt = await r.text(); return txt ? JSON.parse(txt) : null;
+  }
+  const LS = {
+    get(k){ try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+    set(k,v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+    del(k){ try { localStorage.removeItem(k); } catch {} }
+  };
+  // ---------- Helpers ----------
+  const pad = n => String(n).padStart(2,"0");
+  const ymd = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  // รอบสรุปโอที: วันที่ 16 ถึงวันที่ 15 ของเดือนถัดไป
+  function periodOf(key){
+    const d = new Date(key + "T00:00:00");
+    const start = d.getDate() >= 16 ? new Date(d.getFullYear(), d.getMonth(), 16) : new Date(d.getFullYear(), d.getMonth()-1, 16);
+    const end = new Date(start.getFullYear(), start.getMonth()+1, 15);
+    return { start: ymd(start), end: ymd(end), months: [ymd(start).slice(0,7), ymd(end).slice(0,7)] };
+  }
+  const thDate = k => { const [yy,mm,dd] = k.split("-"); return `${dd}/${mm}/${yr(+yy)}`; };
+  const fmt = n => (Math.round(n*100)/100).toString();
+  const split = h => ({ ot: Math.min(h, OT_CAP), ex: Math.max(h - OT_CAP, 0) });
+  const cleanCode = s => s.trim().toUpperCase().replace(/[^A-Z0-9_-]/g, "");
+  function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove("show"),1800); }
+  const WORK_START = 8*60+30, WORK_END = 17*60+30; // เวลาทำงานปกติ 08:30–17:30
+  // 24-hour pickers
+  function buildT24(id){
+    const h=$(id+"-h"), m=$(id+"-m");
+    h.innerHTML = '<option value="">--</option>' + Array.from({length:24},(_,i)=>`<option>${pad(i)}</option>`).join("");
+    m.innerHTML = '<option value="">--</option>' + ["00","15","30","45"].map(v=>`<option>${v}</option>`).join("");
+    h.addEventListener("change", () => { if (h.value && !m.value) m.value = "00"; if (!h.value) m.value = ""; });
+    m.addEventListener("change", () => { if (m.value && !h.value) m.value = ""; });
+  }
+  const getT = id => $(id+"-h").value ? `${$(id+"-h").value}:${$(id+"-m").value || "00"}` : "";
+  function setT(id, v){
+    if (!v) { $(id+"-h").value=""; $(id+"-m").value=""; return; }
+    const [hh,mm] = v.split(":"); $(id+"-h").value=hh;
+    const q = ["00","15","30","45"].includes(mm) ? mm : pad(Math.round(+mm/15)*15 % 60); $(id+"-m").value=q;
+  }
+  buildT24("edStart"); buildT24("edEnd");
+
+  function hoursFromTimes(a,b){
+    if(!a||!b) return null;
+    const [ah,am]=a.split(":").map(Number), [bh,bm]=b.split(":").map(Number);
+    const s0 = ah*60+am; let e0 = bh*60+bm; if (e0<=s0) e0 += 24*60; // ข้ามเที่ยงคืน
+    let m = e0 - s0;
+    // ไม่นับช่วงเวลาทำงานปกติ 08:30–17:30
+    for (const off of [0, 24*60]) m -= Math.max(0, Math.min(e0, WORK_END+off) - Math.max(s0, WORK_START+off));
+    return Math.max(0, Math.round(m/30)/2); // ปัดทีละครึ่งชั่วโมง
+  }
+
+  // ---------- State ----------
+  let me = null;            // {code, name, admin}
+  let view = new Date(); view.setDate(1);
+  let selected = ymd(new Date());
+  let entries = {};         // {"YYYY-MM-DD": {hours,start,end,note}} ของช่วงที่โหลดอยู่
+  const cache = {};         // แคชต่อเดือน ให้สลับเดือนได้ทันที
+  let loadSeq = 0;
+
+  const monthKey = () => `${view.getFullYear()}-${pad(view.getMonth()+1)}`;
+  // โหลดช่วง 16 ของเดือนก่อน – 15 ของเดือนถัดไป ครอบทั้งปฏิทินและรอบสรุปโอที
+  function loadRange(){ const y = view.getFullYear(), m = view.getMonth(); return { from: ymd(new Date(y, m-1, 16)), to: ymd(new Date(y, m+1, 15)) }; }
+  const rowToEntry = x => ({ hours: parseFloat(x.hours), start: x.start_time || null, end: x.end_time || null, note: x.note || "" });
+
+  // ---------- Phase 1: login ----------
+  let pendingNew = false;
+  $("empCode").addEventListener("input", () => { if (pendingNew){ pendingNew=false; $("nameWrap").hidden=true; $("loginBtn").textContent=t("login"); } $("loginErr").textContent=""; });
+
+  $("loginForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    if (!configured) { $("loginErr").textContent = "ยังไม่ได้ใส่ Supabase URL / Key ใน index.html (Supabase is not configured)"; return; }
+    const code = cleanCode($("empCode").value);
+    if (code.length < 3) { $("loginErr").textContent = t("errShort"); return; }
+    $("loginBtn").disabled = true;
+    try {
+      const res = await rpc("ot_login", { p_code: code });
+      if (res && res.exists) return enter({ code, name: res.name || "", admin: !!res.is_admin });
+      if (!pendingNew) {
+        pendingNew = true; $("nameWrap").hidden = false; $("empName").focus();
+        $("loginErr").textContent = t("errNew");
+        $("loginBtn").textContent = t("register");
+        return;
+      }
+      const name = $("empName").value.trim();
+      if (!name) { $("loginErr").textContent = t("errName"); return; }
+      const reg = await rpc("ot_register", { p_code: code, p_name: name });
+      enter({ code, name: (reg && reg.name) || name, admin: !!(reg && reg.is_admin) });
+    } catch (err) {
+      $("loginErr").textContent = t("errConn");
+    } finally { $("loginBtn").disabled = false; }
+  });
+
+  function enter(emp){
+    me = emp; LS.set("session", emp);
+    $("login").hidden = true; $("app").hidden = false;
+    $("topRow").hidden = emp.admin;
+    $("exportBox").hidden = !emp.admin;
+    $("whoSub").textContent = emp.admin ? t("subAdmin") : t("subWork");
+    $("whoCode").textContent = emp.code; $("whoName").textContent = emp.name || t("employee");
+    view = new Date(); view.setDate(1); selected = ymd(new Date());
+    loadMonth();
+  }
+  $("logoutBtn").addEventListener("click", () => {
+    LS.del("session"); me = null; entries = {}; loadSeq++;
+    for (const k of Object.keys(cache)) delete cache[k];
+    $("exportBox").hidden = true;
+    $("app").hidden = true; $("login").hidden = false;
+    $("empCode").value = ""; $("empName").value = ""; $("nameWrap").hidden = true; pendingNew=false;
+    $("loginBtn").textContent=t("login"); $("loginErr").textContent=""; $("empCode").focus();
+  });
+
+  // ---------- Phase 2: calendar ----------
+  async function loadMonth(){
+    const seq = ++loadSeq, ck = monthKey();
+    entries = cache[ck] ? { ...cache[ck] } : {};
+    render();
+    if (!me || me.admin) return;          // หัวหน้าดูปฏิทิน/วันหยุด และดาวน์โหลดเท่านั้น
+    const r = loadRange();
+    try {
+      const rows = await rpc("ot_list", { p_code: me.code, p_from: r.from, p_to: r.to });
+      if (seq !== loadSeq) return;        // ผู้ใช้เปลี่ยนเดือนไปแล้ว
+      const m = {}; (rows || []).forEach(x => { m[x.work_date] = rowToEntry(x); });
+      cache[ck] = m; entries = { ...m }; render();
+    } catch { if (seq === loadSeq) toast(t("errConn")); }
+  }
+  function setEntry(key, val){
+    if (val) entries[key] = val; else delete entries[key];
+    for (const c of Object.values(cache)) { if (val) c[key] = val; else delete c[key]; }
+  }
+
+  // ---------- Export for supervisors ----------
+  function updateExportLabels(){
+    const p = periodOf(selected);
+    $("exMonth").textContent = t("exPeriod", {a: thDate(p.start), b: thDate(p.end)});
+    $("exYear").textContent = t("exYear", {y: yr(view.getFullYear())});
+  }
+  const csvCell = v => { const s = v == null ? "" : String(v); return /[",\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s; };
+  function saveFile(filename, text){
+    const url = URL.createObjectURL(new Blob([text], { type: "text/csv;charset=utf-8" }));
+    const a = document.createElement("a"); a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+  async function exportAll(scope){
+    if (!me || !me.admin) return;
+    const y = view.getFullYear(), per = periodOf(selected);
+    const rStart = scope === "month" ? per.start : `${y}-01-01`, rEnd = scope === "month" ? per.end : `${y}-12-31`;
+    const btns = [$("exMonth"), $("exYear")]; btns.forEach(b => b.disabled = true);
+    $("exStatus").textContent = t("exLoading");
+    try {
+      const data = await rpc("ot_export", { p_admin: me.code, p_from: rStart, p_to: rEnd });
+      const rows = (data || []).map(x => { const h = parseFloat(x.hours), sp = split(h); return [x.emp_code, x.name || "", x.work_date, h, sp.ot, sp.ex]; });
+      if (!rows.length) { $("exStatus").textContent = t("exEmpty"); return; }
+      const sum = {}; rows.forEach(r => { const k=r[0]; sum[k] = sum[k] || {name:r[1], days:0, hours:0, ot:0, ex:0}; sum[k].days++; sum[k].hours+=r[3]; sum[k].ot+=r[4]; sum[k].ex+=r[5]; });
+      // หนึ่งแถวต่อพนักงาน · คอลัมน์ = ทุกวันในช่วงที่เลือก · ช่อง = ชั่วโมงโอทีรวมของวันนั้น
+      const dates = [];
+      for (const d = new Date(rStart + "T00:00:00"), dEnd = new Date(rEnd + "T00:00:00"); d <= dEnd; d.setDate(d.getDate()+1)) dates.push(ymd(d));
+      const byEmp = {}; rows.forEach(r => { (byEmp[r[0]] = byEmp[r[0]] || {})[r[2]] = r[3]; });
+      const emps = Object.keys(sum).sort((a,b) => a.localeCompare(b, undefined, {numeric:true}));
+      const head = [t("csvId"), t("csvName"), ...dates.map(k => { const [yy,mm,dd] = k.split("-"); return `${dd}/${mm}/${yy}`; })];
+      const lines = [head.map(csvCell).join(",")];
+      emps.forEach(k => lines.push([k, sum[k].name, ...dates.map(dt => byEmp[k][dt] ? byEmp[k][dt].toFixed(1) : "")].map(csvCell).join(",")));
+      lines.push("", csvCell(t("csvSummary")), [t("csvId"),t("csvName"),t("csvDays"),t("csvHours"),"OT","Extra OT"].map(csvCell).join(","));
+      emps.forEach(k => { const v = sum[k]; lines.push([k, v.name, v.days, fmt(v.hours), fmt(v.ot), fmt(v.ex)].map(csvCell).join(",")); });
+      const filename = scope === "month" ? `${t("fileAll")}_${rStart}_${t("fileTo")}_${rEnd}.csv` : `${t("fileAll")}_${y}.csv`;
+      saveFile(filename, "﻿" + lines.join("\r\n"));
+      $("exStatus").textContent = t("exDone", {n: rows.length, p: emps.length});
+    } catch {
+      $("exStatus").textContent = t("exFail");
+    } finally { btns.forEach(b => b.disabled = false); }
+  }
+  $("exMonth").addEventListener("click", () => exportAll("month"));
+  $("exYear").addEventListener("click", () => exportAll("year"));
+
+  function render(){
+    $("monthTitle").textContent = `${L().months[view.getMonth()]} ${yr(view.getFullYear())}`;
+    const first = new Date(view), y = first.getFullYear(), m = first.getMonth();
+    const start = new Date(y, m, 1 - first.getDay());
+    const weeks = Math.ceil((first.getDay() + new Date(y, m+1, 0).getDate()) / 7);
+    const today = ymd(new Date());
+    const box = $("days"); box.innerHTML = "";
+    for (let i = 0; i < weeks*7; i++) {
+      const d = new Date(start); d.setDate(start.getDate()+i);
+      const key = ymd(d), inMonth = d.getMonth() === m;
+      const b = document.createElement("button"); b.type="button";
+      const hol = inMonth ? holName(key) : null;
+      b.className = "day" + (inMonth ? "" : " out") + (hol ? " holiday" : "") + (inMonth && d.getDay()===0 ? " sun" : "") + (key===today ? " today" : "") + (inMonth && key===selected ? " sel" : "");
+      const dn = document.createElement("span"); dn.className="d"; dn.textContent=d.getDate(); b.appendChild(dn);
+      if (hol) { const hn=document.createElement("span"); hn.className="hol-name"; hn.textContent=hol; b.appendChild(hn); }
+      if (inMonth) {
+        const e = entries[key];
+        if (e && e.hours > 0) {
+          const s = split(e.hours);
+          const c1 = document.createElement("span"); c1.className="chip ot"; c1.textContent=`OT ${fmt(s.ot)}`; b.appendChild(c1);
+          if (s.ex > 0){ const c2=document.createElement("span"); c2.className="chip ex"; c2.textContent=`EX ${fmt(s.ex)}`; b.appendChild(c2); }
+          if (e.note){ const n=document.createElement("span"); n.className="note-dot"; n.textContent=e.note; b.appendChild(n); }
+        }
+        b.setAttribute("aria-label", `${d.getDate()} ${L().months[m]}` + (hol ? ` ${hol}` : "") + (e && e.hours ? " " + t("ariaOt", {h: fmt(e.hours)}) : ""));
+        b.addEventListener("click", () => { selected = key; render(); if (me && me.admin) return; const f=$("editor"); if (f.getBoundingClientRect().top < 0) f.scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"start"}); $("edHours").focus({preventScroll:true}); });
+      } else { b.disabled = true; b.tabIndex = -1; }
+      box.appendChild(b);
+    }
+    fillEditor(); renderSummary(); if (me && me.admin) updateExportLabels();
+  }
+
+  function renderSummary(){
+    if (!me || me.admin) return;
+    const p = periodOf(selected);
+    $("sumTitle").textContent = t("sumTitle");
+    $("sumRange").textContent = `${thDate(p.start)} – ${thDate(p.end)}`;
+    let ot=0, ex=0, days=0;
+    for (const [k,e] of Object.entries(entries)) { if (k < p.start || k > p.end || !(e.hours>0)) continue; const s=split(e.hours); ot+=s.ot; ex+=s.ex; days++; }
+    $("sumOt").textContent = fmt(ot); $("sumEx").textContent = fmt(ex); $("sumDays").textContent = days;
+    const tot = ot+ex || 1;
+    $("barOt").style.width = (ot/tot*100)+"%"; $("barEx").style.width = (ex/tot*100)+"%";
+  }
+
+  function fillEditor(){
+    if (!selected.startsWith(monthKey())) selected = `${monthKey()}-01`;
+    const d = new Date(selected + "T00:00:00");
+    $("edDate").textContent = t("edDate", {dow: L().dow[d.getDay()], d: d.getDate(), m: L().months[d.getMonth()], y: yr(d.getFullYear())});
+    const hol = holName(selected); $("edHol").hidden = !hol; $("edHol").textContent = hol ? t("holTag", {h: hol}) : "";
+    const e = entries[selected];
+    setT("edStart", e ? (e.start || "") : ""); setT("edEnd", e ? (e.end || "") : "");
+    $("edHint").textContent = t("hint");
+    $("edHours").value = e?.hours ?? ""; $("edNote").value = e?.note || "";
+    $("delBtn").hidden = !e; resetDel(); preview();
+  }
+
+  function preview(){
+    const h = parseFloat($("edHours").value) || 0, s = split(h);
+    $("pvOt").textContent = fmt(s.ot); $("pvEx").textContent = fmt(s.ex);
+  }
+  function syncTimes(){ const h = hoursFromTimes(getT("edStart"), getT("edEnd"), selected); if (h !== null) { $("edHours").value = h; preview(); } }
+  ["edStart-h","edStart-m","edEnd-h","edEnd-m"].forEach(id => $(id).addEventListener("change", syncTimes));
+  $("edHours").addEventListener("input", preview);
+
+  // บันทึกแบบแสดงผลทันที แล้วส่งขึ้น Supabase เบื้องหลัง (ถ้าไม่สำเร็จจะย้อนค่ากลับ)
+  $("editor").addEventListener("submit", async e => {
+    e.preventDefault();
+    const h = parseFloat($("edHours").value);
+    if (!(h > 0) || h > 24) { toast(t("errHours")); $("edHours").focus(); return; }
+    const key = selected, prev = entries[key];
+    const val = { hours: Math.round(h*2)/2, start: getT("edStart") || null, end: getT("edEnd") || null, note: $("edNote").value.trim() };
+    setEntry(key, val); render();
+    const s = split(val.hours); toast(s.ex>0 ? t("savedEx", {o: fmt(s.ot), e: fmt(s.ex)}) : t("saved", {o: fmt(s.ot)}));
+    $("saveBtn").disabled = true;
+    try { await rpc("ot_save", { p_code: me.code, p_date: key, p_hours: val.hours, p_start: val.start || "", p_end: val.end || "", p_note: val.note }); }
+    catch { setEntry(key, prev); render(); toast(t("saveFail")); }
+    finally { $("saveBtn").disabled = false; }
+  });
+
+  // inline confirm for delete (no browser dialogs)
+  function resetDel(){ const w=$("delWrap"); const c=w.querySelector(".confirm"); if(c) c.remove(); $("delBtn").style.display=""; }
+  $("delBtn").addEventListener("click", () => {
+    $("delBtn").style.display="none";
+    const c = document.createElement("span"); c.className="confirm";
+    c.innerHTML = `${t("delQ")} <button type="button" class="btn danger" id="delYes">${t("delYes")}</button><button type="button" class="btn ghost" id="delNo">${t("cancel")}</button>`;
+    $("delWrap").appendChild(c);
+    $("delNo").onclick = resetDel;
+    $("delYes").onclick = async () => {
+      const key = selected, prev = entries[key];
+      setEntry(key, null); render(); toast(t("deleted"));
+      try { await rpc("ot_delete", { p_code: me.code, p_date: key }); }
+      catch { setEntry(key, prev); render(); toast(t("delFail")); }
+    };
+  });
+
+  $("prevM").addEventListener("click", () => { view.setMonth(view.getMonth()-1); selected = `${monthKey()}-01`; loadMonth(); });
+  $("nextM").addEventListener("click", () => { view.setMonth(view.getMonth()+1); selected = `${monthKey()}-01`; loadMonth(); });
+  $("todayBtn").addEventListener("click", () => { view = new Date(); view.setDate(1); selected = ymd(new Date()); loadMonth(); });
+
+  // language switcher
+  function setLang(l){
+    if (!I18N[l]) return; LANG = l; try { localStorage.setItem("ot:lang", l); } catch {}
+    applyStatic();
+    $("loginBtn").textContent = pendingNew ? t("register") : t("login"); $("loginErr").textContent = "";
+    if (me) { $("whoSub").textContent = me.admin ? t("subAdmin") : t("subWork"); if (!me.name) $("whoName").textContent = t("employee"); if (!$("exportBox").hidden) $("exStatus").textContent = t("exSub"); render(); }
+  }
+  document.querySelectorAll(".lang button").forEach(b => b.addEventListener("click", () => setLang(b.dataset.lang)));
+  applyStatic(); $("loginBtn").textContent = t("login");
+
+  // จำการเข้าสู่ระบบไว้ในเครื่องนี้
+  const saved = LS.get("session");
+  if (saved && saved.code && configured) enter(saved); else $("empCode").focus();
+})();
+</script>
+</body>
+</html>
